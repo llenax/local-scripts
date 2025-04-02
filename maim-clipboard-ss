@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+if [ -z "$MAIM_PKG" ]; then
+  echo "maim-clipboard-ss: no maim package found (set env var MAIM_PKG)";
+  exit 1;
+fi
+
+echo "maim-clipboard-ss: using maim package $MAIM_PKG";
+
+eval $(xdotool getmouselocation --shell);
+while read -r SCREEN_NAME GEOMETRY REST; do
+  if [ -n "$GEOMETRY" ] && echo "$GEOMETRY" | grep -q "[0-9]\\+x[0-9]\\+[+-][0-9]\\+[+-][0-9]\\+"; then
+    WIDTH=$(echo "$GEOMETRY" | cut -d"x" -f1);
+    HEIGHT=$(echo "$GEOMETRY" | cut -d"x" -f2 | cut -d"+" -f1);
+    X_OFFSET=$(echo "$GEOMETRY" | cut -d"+" -f2);
+    Y_OFFSET=$(echo "$GEOMETRY" | cut -d"+" -f3);
+    if [ "$X" -ge "$X_OFFSET" ] && [ "$X" -lt "$((X_OFFSET + WIDTH))" ] && [ "$Y" -ge "$Y_OFFSET" ] && [ "$Y" -lt "$((Y_OFFSET + HEIGHT))" ]; then
+      $MAIM_PKG -g "${WIDTH}x${HEIGHT}+${X_OFFSET}+${Y_OFFSET}" | xclip -selection clipboard -t image/png;
+      break;
+    fi;
+  fi;
+done < <(xrandr --current | grep " connected" | awk "{for (i=2; i<=NF; i++) if (\$i ~ /[0-9]+x[0-9]+[+-][0-9]+[+-][0-9]+/) {print \$1, \$i; break}}")
