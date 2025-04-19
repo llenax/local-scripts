@@ -1,0 +1,55 @@
+
+# [App]s: each directory inside ~/.local/apps
+# check "bin" directory exists inside that directory
+# add to BIN_DIR as `x:y:z` for correct path environment
+BIN_DIR=""
+LIB_DIR=""
+INCLUDE_DIR=""
+PKGCONFIG_DIR=""
+LUA_DIR=""
+LUA_LIBRARIES=""
+LUA_INCLUDE_DIR=""
+
+for dir in $HOME/.local/apps/*; do
+
+  if [[ "${dir##*/}" == lua-5.4* ]]; then
+    continue
+  fi
+
+  if [ -d "$dir/lib" ]; then
+    LIB_DIR=${LIB_DIR:+$LIB_DIR:}"$dir/lib"
+  fi
+
+  if [ -d "$dir/lib/pkgconfig" ]; then
+    PKGCONFIG_DIR=${PKGCONFIG_DIR:+$PKGCONFIG_DIR:}"$dir/lib/pkgconfig"
+  fi
+
+  if [ -d "$dir/include" ]; then
+    INCLUDE_DIR=${INCLUDE_DIR:+$INCLUDE_DIR:}"$dir/include"
+  fi
+
+  if [ -d "$dir/bin" ]; then
+    BIN_DIR=${BIN_DIR:+$BIN_DIR:}"$dir/bin"
+  fi
+
+  if [[ -d "$dir" && "${dir##*/}" == lua-5.3* ]]; then
+    LUA_DIR="$dir"
+    LUA_LIBRARIES="$dir/lib"
+    LUA_INCLUDE_DIR="$dir/include"
+  fi
+done
+
+export PATH=${PATH:+$PATH:}$BIN_DIR
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$LIB_DIR
+export C_INCLUDE_PATH=${C_INCLUDE_PATH:+$C_INCLUDE_PATH:}$INCLUDE_DIR
+export CPLUS_INCLUDE_PATH=${CPLUS_INCLUDE_PATH:+$CPLUS_INCLUDE_PATH:}$INCLUDE_DIR
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$PKGCONFIG_DIR
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$HOME/build/lua-5.3.6/etc
+
+export LUA_DIR=$LUA_DIR
+export LUA_LIBRARIES=$LUA_LIBRARIES
+export LUA_INCLUDE_DIR=$LUA_INCLUDE_DIR
+
+if [ -d "$HOME/.luarocks/bin" ]; then
+  export PATH=${PATH:+$PATH:}$HOME/.luarocks/bin
+fi
