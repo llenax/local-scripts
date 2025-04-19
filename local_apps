@@ -1,4 +1,5 @@
-
+#!/usr/bin/env bash
+#
 # [App]s: each directory inside ~/.local/apps
 # check "bin" directory exists inside that directory
 # add to BIN_DIR as `x:y:z` for correct path environment
