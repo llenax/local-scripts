@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -o pipefail
+
+if [ -z "$MAIM_PKG" ]; then
+  echo "maim-clipboard-ss: no maim package found (set env var MAIM_PKG)";
+  exit 1;
+fi
+
+if [ ! command -v $MAIM_PKG >/dev/null 2>&1 ]; then
+  echo "Error: maim is not installed";
+  exit 1;
+fi
+
+if [ ! command -v xclip >/dev/null 2>&1 ]; then
+  echo "Error: xclip is not installed";
+  exit 1;
+fi
+
+echo "maim-clipboard-ss-area: using maim package $MAIM_PKG";
+
+if $MAIM_PKG --select | xclip -selection clipboard -t image/png; then 
+  echo "Screenshot copied to clipboard";
+else
+  echo "Screenshot cancelled";
+fi

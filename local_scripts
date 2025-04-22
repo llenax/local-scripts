@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$HOME/.local/scripts
+
+if [ ! -d $SCRIPT_DIR ]; then
+  mkdir -p $SCRIPT_DIR
+fi
+
+shopt -s nullglob
+SCRIPTS=(./scripts/*)
+for ((i=0; i<${#SCRIPTS[@]}; i++)); do
+  script=${SCRIPTS[$i]}
+  if [ -x $script ]; then
+    remote=$SCRIPT_DIR/${script##*/}
+
+    if [ $i -ne 0 ]; then
+      echo 
+    fi
+
+    found_script_str="Found script: $script";
+    copy_script_str="Copying new script: $remote";
+    remove_script_str="Removing old script: $remote";
+
+    printf -v str "%*s" "${#found_script_str}"
+    printf "%s\n" "${str// /━}"
+    echo $found_script_str;
+
+    if rm $remote >/dev/null 2>&1; then
+      echo $remove_script_str; 
+    fi
+
+    if cp $script $remote; then
+      echo $copy_script_str;
+      printf -v str "%*s" "${#copy_script_str}"
+      printf "%s\n" "${str// /━}"
+    fi
+  fi
+done
